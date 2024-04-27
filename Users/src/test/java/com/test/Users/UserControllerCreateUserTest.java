@@ -2,10 +2,10 @@ package com.test.Users;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
-import com.test.Users.controllers.UserController;
-import com.test.Users.dto.UserDTO;
+import com.test.Users.controller.UserController;
+import com.test.Users.dto.UserRequestDTO;
 import com.test.Users.model.Users;
-import com.test.Users.services.UserService;
+import com.test.Users.service.UserService;
 import com.test.Users.util.AgeChecker;
 import com.test.Users.util.EmailValidator;
 import org.junit.Before;
@@ -43,19 +43,19 @@ public class UserControllerCreateUserTest {
     @Test
     public void testCreateUser_ValidUser_ReturnsCreated() {
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.setEmail("john.doe@example.com");
-        userDTO.setFirstName("John");
-        userDTO.setLastName("Doe");
-        userDTO.setBirthDate(LocalDate.ofEpochDay(1990 - 1 - 1));
+        UserRequestDTO userRequestDTO = new UserRequestDTO();
+        userRequestDTO.setEmail("john.doe@example.com");
+        userRequestDTO.setFirstName("John");
+        userRequestDTO.setLastName("Doe");
+        userRequestDTO.setBirthDate(LocalDate.ofEpochDay(1990 - 1 - 1));
 
         Users newUser = new Users();
-        when(userService.createUser(any(UserDTO.class))).thenReturn(newUser);
+        when(userService.createUser(any(UserRequestDTO.class))).thenReturn(newUser);
         when(ageChecker.isUserAdult(any(LocalDate.class))).thenReturn(true);
         when(EmailValidator.isValidEmail(anyString())).thenReturn(true);
 
         // Act
-        ResponseEntity<?> response = userController.createUser(userDTO);
+        ResponseEntity<?> response = userController.createUser(userRequestDTO);
 
         // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -66,10 +66,10 @@ public class UserControllerCreateUserTest {
     @Test
     public void testCreateUser_InvalidEmailFormat_ReturnsBadRequest() {
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.setEmail("invalid-email-format");
+        UserRequestDTO userRequestDTO = new UserRequestDTO();
+        userRequestDTO.setEmail("invalid-email-format");
 
-        ResponseEntity<?> response = userController.createUser(userDTO);
+        ResponseEntity<?> response = userController.createUser(userRequestDTO);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());

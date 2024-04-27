@@ -1,9 +1,8 @@
-package com.test.Users.controllers;
+package com.test.Users.controller;
 
-import com.test.Users.dto.DataRangeDTO;
-import com.test.Users.dto.UserDTO;
+import com.test.Users.dto.UserRequestDTO;
 import com.test.Users.model.Users;
-import com.test.Users.services.UserService;
+import com.test.Users.service.UserService;
 import com.test.Users.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -29,28 +28,28 @@ public class UserController {
     }
 
     @GetMapping
-    public List<UserDTO> getAllUsers() {
+    public List<UserRequestDTO> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO){
-        if (userDTO.getEmail() == null || userDTO.getFirstName() == null || userDTO.getLastName() == null || userDTO.getBirthDate() == null) {
+    public ResponseEntity<?> createUser(@RequestBody UserRequestDTO userRequestDTO){
+        if (userRequestDTO.getEmail() == null || userRequestDTO.getFirstName() == null || userRequestDTO.getLastName() == null || userRequestDTO.getBirthDate() == null) {
             return ResponseEntity.badRequest().body("The fields email, first name, last name and date of birth are required.");
         }
-        if (!ageChecker.isUserAdult(userDTO.getBirthDate())) {
+        if (!ageChecker.isUserAdult(userRequestDTO.getBirthDate())) {
             return ResponseEntity.badRequest().body("You must be over  " + ageChecker.getAgeLimit() + " years old to register.");
         }
-        if (!EmailValidator.isValidEmail(userDTO.getEmail())) {
+        if (!EmailValidator.isValidEmail(userRequestDTO.getEmail())) {
            throw  new EmailFormatException();
         }
-        System.out.println(userDTO.toString());
-        Users newUser = userService.createUser(userDTO);
+        System.out.println(userRequestDTO.toString());
+        Users newUser = userService.createUser(userRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
     @PatchMapping("/update/{userId}")
-    public ResponseEntity<?> updateUser(@PathVariable int userId, @RequestBody UserDTO userDTO){
+    public ResponseEntity<?> updateUser(@PathVariable int userId, @RequestBody UserRequestDTO userRequestDTO){
 
         Users existingUser = userService.findById(userId);
 
@@ -58,23 +57,23 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
-        if (userDTO.getEmail() != null) {
-            existingUser.setEmail(userDTO.getEmail());
+        if (userRequestDTO.getEmail() != null) {
+            existingUser.setEmail(userRequestDTO.getEmail());
         }
-        if (userDTO.getFirstName() != null) {
-            existingUser.setFirstName(userDTO.getFirstName());
+        if (userRequestDTO.getFirstName() != null) {
+            existingUser.setFirstName(userRequestDTO.getFirstName());
         }
-        if (userDTO.getLastName() != null) {
-            existingUser.setLastName(userDTO.getLastName());
+        if (userRequestDTO.getLastName() != null) {
+            existingUser.setLastName(userRequestDTO.getLastName());
         }
-        if (userDTO.getBirthDate() != null) {
-            existingUser.setBirthDate(userDTO.getBirthDate());
+        if (userRequestDTO.getBirthDate() != null) {
+            existingUser.setBirthDate(userRequestDTO.getBirthDate());
         }
-        if (userDTO.getAddress() != null) {
-            existingUser.setAddress(userDTO.getAddress());
+        if (userRequestDTO.getAddress() != null) {
+            existingUser.setAddress(userRequestDTO.getAddress());
         }
-        if (userDTO.getPhoneNumber() != null) {
-            existingUser.setPhoneNumber(userDTO.getPhoneNumber());
+        if (userRequestDTO.getPhoneNumber() != null) {
+            existingUser.setPhoneNumber(userRequestDTO.getPhoneNumber());
         }
 
         Users updatedUser = userService.updateUser(existingUser);
@@ -83,24 +82,21 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<?> updateAllInfoForUser(@PathVariable int userId, @RequestBody UserDTO userDTO) {
-        Users updatedUser = userService.updateUser(userId, userDTO);
+    public ResponseEntity<?> updateAllInfoForUser(@PathVariable int userId, @RequestBody UserRequestDTO userRequestDTO) {
+        Users updatedUser = userService.updateUser(userId, userRequestDTO);
         return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/{userId}/delete")
-    public ResponseEntity<?> deleteUser(@PathVariable int userId) {
+    public ResponseEntity<?>  deleteUser(@PathVariable int userId) {
         userService.deleteUser(userId);
-        return ResponseEntity.ok("User deleted successfully");
+        return ResponseEntity.ok("The user has been successfully deleted");
     }
 
-    @GetMapping("/searchByBirthDateRange")
-    public ResponseEntity<?> searchUsersByBirthDateRange(@RequestBody DataRangeDTO dataRangeDTO) {
+    @GetMapping("/searchByBirthDateRange?fromBirthDate=&toBirthDate=")
+    public ResponseEntity<?> searchUsersByBirthDateRange(@RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+                                                         @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
 
-        LocalDate from = dataRangeDTO.getFrom();
-        LocalDate to = dataRangeDTO.getTo();
-
-        System.out.println(from +"   " + to);
         if (from.isAfter(to)) {
             return ResponseEntity.badRequest().body("The 'from' date must be before the 'to' date.");
         }

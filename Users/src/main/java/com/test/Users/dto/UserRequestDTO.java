@@ -1,8 +1,10 @@
 package com.test.Users.dto;
 
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-public class UserDTO {
+public class UserRequestDTO {
+    @Pattern(regexp = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$")
     private String email;
     private String firstName;
     private String lastName;
@@ -11,10 +13,10 @@ public class UserDTO {
     private String phoneNumber;
 
 
-    public UserDTO() {
+    public UserRequestDTO() {
     }
 
-    public UserDTO(String email, String firstName, String lastName, LocalDate birthDate, String address, String phoneNumber) {
+    public UserRequestDTO(String email, String firstName, String lastName, LocalDate birthDate, String address, String phoneNumber) {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;

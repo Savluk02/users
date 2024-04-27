@@ -1,8 +1,8 @@
 package com.test.Users;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
-import com.test.Users.controllers.UserController;
-import com.test.Users.services.UserService;
+import com.test.Users.controller.UserController;
+import com.test.Users.service.UserService;
 import com.test.Users.util.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;

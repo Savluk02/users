@@ -1,8 +1,8 @@
 package com.test.Users;
 
-import com.test.Users.controllers.UserController;
-import com.test.Users.dto.UserDTO;
-import com.test.Users.services.UserService;
+import com.test.Users.controller.UserController;
+import com.test.Users.dto.UserRequestDTO;
+import com.test.Users.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -31,14 +31,14 @@ public class UserControllerGetAllUsersTest {
     @Test
     public void testGetAllUsers() {
         // Arrange
-        List<UserDTO> mockUsers = new ArrayList<>();
-        mockUsers.add(new UserDTO("john.doe@example.com", "John", "Doe", LocalDate.of(1990, 1, 1), "123 Main St, City", "123-456-7890"));
-        mockUsers.add(new UserDTO("jane.smith@example.com", "Jane", "Smith", LocalDate.of(1995, 5, 15), "456 Elm St, Town", "456-789-0123"));
+        List<UserRequestDTO> mockUsers = new ArrayList<>();
+        mockUsers.add(new UserRequestDTO("john.doe@example.com", "John", "Doe", LocalDate.of(1990, 1, 1), "123 Main St, City", "123-456-7890"));
+        mockUsers.add(new UserRequestDTO("jane.smith@example.com", "Jane", "Smith", LocalDate.of(1995, 5, 15), "456 Elm St, Town", "456-789-0123"));
 
         Mockito.when(userService.getAllUsers()).thenReturn(mockUsers);
 
         // Act
-        List<UserDTO> result = userController.getAllUsers();
+        List<UserRequestDTO> result = userController.getAllUsers();
 
         // Assert
         assertNotNull(result);

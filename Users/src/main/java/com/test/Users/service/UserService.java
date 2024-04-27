@@ -1,15 +1,13 @@
-package com.test.Users.services;
+package com.test.Users.service;
 
-import com.test.Users.dto.UserDTO;
+import com.test.Users.dto.UserRequestDTO;
 import com.test.Users.model.Users;
-import com.test.Users.repositories.UserRepository;
+import com.test.Users.repository.UserRepository;
 import com.test.Users.util.UserNotFoundException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,9 +25,9 @@ public class UserService {
     }
 
     @Transactional
-    public Users createUser(UserDTO userDTO){
+    public Users createUser(UserRequestDTO userRequestDTO){
 
-        Users users = new Users(userDTO.getEmail(), userDTO.getFirstName(), userDTO.getLastName(),userDTO.getBirthDate(), userDTO.getAddress(), userDTO.getPhoneNumber());
+        Users users = new Users(userRequestDTO.getEmail(), userRequestDTO.getFirstName(), userRequestDTO.getLastName(), userRequestDTO.getBirthDate(), userRequestDTO.getAddress(), userRequestDTO.getPhoneNumber());
         return userRepository.save(users);
     }
 
@@ -48,15 +46,15 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserDTO> getAllUsers() {
+    public List<UserRequestDTO> getAllUsers() {
         List<Users> users = userRepository.findAll();
         return users.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    private UserDTO convertToDto(Users user) {
-        return new UserDTO(
+    private UserRequestDTO convertToDto(Users user) {
+        return new UserRequestDTO(
                 user.getEmail(),
                 user.getFirstName(),
                 user.getLastName(),
@@ -66,17 +64,16 @@ public class UserService {
         );
     }
     @Transactional
-    public Users updateUser(int userId, UserDTO userDTO) {
+    public Users updateUser(int userId, UserRequestDTO userRequestDTO) {
         Users existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
-        // Оновлення всіх полів користувача
-        existingUser.setEmail(userDTO.getEmail());
-        existingUser.setFirstName(userDTO.getFirstName());
-        existingUser.setLastName(userDTO.getLastName());
-        existingUser.setBirthDate(userDTO.getBirthDate());
-        existingUser.setAddress(userDTO.getAddress());
-        existingUser.setPhoneNumber(userDTO.getPhoneNumber());
+        existingUser.setEmail(userRequestDTO.getEmail());
+        existingUser.setFirstName(userRequestDTO.getFirstName());
+        existingUser.setLastName(userRequestDTO.getLastName());
+        existingUser.setBirthDate(userRequestDTO.getBirthDate());
+        existingUser.setAddress(userRequestDTO.getAddress());
+        existingUser.setPhoneNumber(userRequestDTO.getPhoneNumber());
 
         return userRepository.save(existingUser);
     }
